@@ -1,6 +1,6 @@
-First Python Game
+##First Python Game
 
-About
+##About
 This was my first ever project and the first time I began learning python. I created it in 2024 during my PLC (Post Leaving Certificate) Computer Science course
 with help from a friend who introduced me to the basics. Starting with a simple game matched my interest in game development and helped me understand how Python works
 especially OOP and how objects behave.
