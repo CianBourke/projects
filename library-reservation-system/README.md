@@ -1,7 +1,7 @@
 # Library Reservation System
 
 ## About
-I made this in 2026 as the final project for the second semester of my second year. I really liked how it turned out, so I wanted to highlight it here.
+I made this in 2025 as the final project for the second semester of my second year. I really liked how it turned out, so I wanted to highlight it here.
 
 It's a book reservation app where users can log in, sign up, and search through books stored in a database, then choose to reserve one. Building this helped me learn how to connect a database to PHP, and improved my understanding of PHP overall, along with new ways of handling passwords and validating input.
 
