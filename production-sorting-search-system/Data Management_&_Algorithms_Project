@@ -1,0 +1,306 @@
+/*
+ * Production Data Management & Algorithms Project
+ *
+ * A C program for processing production data from multiple delivery batches.
+ *
+ * Features:
+ * - Sorts production records by weight using Merge Sort: O(N log N)
+ * - Combines production batches into a single array: O(N)
+ * - Searches for the earliest matching weight using Binary Search: O(log N)
+ * - Generates delivery summary reports: O(N)
+ *
+ * Author: Cian Bourke
+ * Date: 4/21/2025
+ */
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define SIZE 82
+
+struct Production_data// Define structure for the production data
+{
+    int product_id;
+    char product_name[SIZE];
+    char target_engine_code[SIZE];
+    int bin_number;
+    float weight;
+    float price;
+    int date[SIZE];
+    char month[SIZE];
+    int year;
+    char Time[SIZE];
+};
+
+// Function signatures
+void merge(struct Production_data batch[], int left, int middle, int right);
+void mergeSort(struct Production_data batch[], int left, int right);
+int binary_Search_Weight(struct Production_data batch[], int total, float input_Weight);
+void report_summary(struct Production_data all_batches[],int total);
+
+
+int main()
+{
+
+    struct Production_data all_batches[40]; // all batches in one array
+
+    //declare variables
+    float input_weight;//weight input from user
+    int position = 0;
+    int total;
+    char report[10]; // Stores the user's report selection
+
+
+
+    // Batch 1 batches have hardcoded data
+    struct Production_data batch1[] = 
+    {//ID |  Name |Engine code|Bin num|Weight|price
+        {1, "Oil pump", "X223", 1, 2.5, 154.0, {25}, "September", 2020, "6:45"},
+        {2, "Fuel injector", "X178", 2, 1.5, 120.0, {26}, "September", 2020, "7:00"},
+        {3, "Spark plug", "X323", 3, 0.2, 15.0, {25}, "September", 2020, "6:13"},
+        {4, "Brake pad", "X456", 8, 1.2, 60.0, {28}, "October", 2020, "7:30"},
+        {5, "Radiator", "X789", 23, 15.0, 100.0, {22}, "September", 2020, "7:47"},
+        {6, "Oil filter", "X123", 2, 0.3, 10.0, {30}, "September", 2020, "8:00"},
+        {7, "Shock absorber", "X456", 5, 3.5, 150.0, {18}, "October", 2020, "7:25"},
+        {8, "Windshield wiper", "X169", 9, 0.4, 15.0, {26}, "October", 2020, "8:30"},
+        {9, "Alternator", "X789", 12, 8.0, 250.0, {25}, "October", 2020, "8:45"},
+        {10, "Headlight", "X678", 13, 2.0, 75.0, {4}, "October", 2020, "7:00"}
+    };
+
+    // Batch 2
+    struct Production_data batch2[] = 
+    {//ID |  Name |Engine code|Bin num|Weight|price
+        {1, "Oil pump", "BE253", 1, 5, 250.0, {20}, "August", 2020, "8:22"},
+        {2, "Gear box", "BE378", 2, 4.5, 140.0, {26}, "October", 2020, "9:00"},
+        {3, "Spark plug", "BE563", 3, 0.4, 45.0, {27}, "September", 2020, "8:33"},
+        {4, "Engine", "BE766", 8, 8.5, 60.0, {28}, "October", 2020, "9:26"},
+        {5, "Battery", "BE469", 23, 6.0, 100.0, {29}, "September", 2020, "7:45"},
+        {6, "Hand brake", "BE343", 2, 0.7, 10.0, {30}, "September", 2020, "8:05"},
+        {7, "Steering wheel", "BE116", 5, 4.5, 150.0, {1}, "November", 2020, "10:25"},
+        {8, "Windscreen", "BE569", 9, 10.4, 15.0, {2}, "October", 2020, "9:30"},
+        {9, "Alternator", "BE389", 12, 7.0, 250.0, {3}, "December", 2020, "1:45"},
+        {10, "Taillight", "BE278", 13, 12.0, 75.0, {8}, "October", 2020, "7:00"}
+    };
+
+    // Batch 3
+    struct Production_data batch3[] = 
+    {//ID |  Name |Engine code|bin num|Weight|price
+        {1, "Bumper", "WB253", 1, 9, 175.0, {17}, "October", 2020, "7:32"},
+        {2, "Fuel injector", "WB378", 2, 4.5, 120.0, {26}, "October", 2020, "8:00"},
+        {3, "Seatbelt", "WB563", 3, 3.2, 35.0, {19}, "October", 2020, "6:33"},
+        {4, "Brake pad", "WB766", 8, 1.7, 80.0, {28}, "October", 2020, "8:30"},
+        {5, "Battery", "WB469", 23, 11.0, 114.0, {29}, "October", 2020, "7:15"},
+        {6, "Oil filter", "XB343", 2, 0.9, 22.0, {25}, "September", 2020, "7:15"},
+        {7, "Shock absorber", "WB116", 4, 6.5, 190.0, {9}, "September", 2020, "8:25"},
+        {8, "Hood", "WB569", 9, 2.3, 7.8, {18}, "October", 2020, "7:30"},
+        {9, "Alternator", "WB389", 12, 3.0, 150.0, {2}, "December", 2020, "6:45"},
+        {10, "Headlight", "WB278", 13, 6.4, 45.0, {9}, "October", 2020, "9:10"}
+    };
+
+    // Batch 4
+    struct Production_data batch4[] = 
+    {//ID |  Name |Engine code|Bin num|Weight|price
+        {1, "Seatbelts", "DL153", 1, 4, 220.0, {20}, "October", 2020, "8:22"},
+        {2, "Fuel injector", "DL078", 8, 6.5, 140.0, {29}, "December", 2020, "9:00"},
+        {3, "Spark plug", "DL163", 3, 2.4, 28.0, {27}, "December", 2020, "8:33"},
+        {4, "Hand brake", "DL366", 8, 1.5, 100.0, {28}, "October", 2020, "9:26"},
+        {5, "Battery", "DL579", 23, 15.0, 108.0,{29}, "December", 2020, "7:45"},
+        {6, "Oil filter", "DL873", 2, 1.4, 14.0,{30}, "November", 2020, "8:05"},
+        {7, "Shock absorber", "DL516", 5, 2.5, 120.0, {1}, "December", 2020, "10:25"},
+        {8, "Windshield wiper", "DL638", 6, 2.9, 25.0, {5}, "December", 2020, "9:30"},
+        {9, "Engine", "DL912", 12, 16.0, 150.0, {10}, "December", 2020, "1:45"},
+        {10, "Headlight", "DL764", 13, 3.0, 35.0, {8}, "November", 2020, "7:00"}
+    };
+
+    // copy batches to a single array
+    for (int i = 0; i < 10; i++) 
+    {
+        all_batches[position++] = batch1[i];
+    }
+
+    for (int i = 0; i < 10; i++) 
+    {
+        all_batches[position++] = batch2[i];
+    }
+
+    for (int i = 0; i < 10; i++) 
+    {
+        all_batches[position++] = batch3[i];
+    }
+
+    for (int i = 0; i < 10; i++) 
+    {
+        all_batches[position++] = batch4[i];
+    }
+
+    total = position; // Total number of products copied into the merged array
+
+    printf("Production of all batches unsorted : \n");
+    for (int i = 0; i < total; i++) // display sorted batches by weight
+    {
+        printf("ID: %d | Name: %s | Weight: %.2f kg| Date: %d |Month: %s| year: %d | Time: %s\n",all_batches[i].product_id,all_batches[i].product_name,
+            all_batches[i].weight,all_batches[i].date[0],all_batches[i].month, all_batches[i].year,all_batches[i].Time);
+    }
+    
+
+    mergeSort(all_batches, 0, total - 1);// Sorting products by weight using merge sort function 
+
+    printf("\nProduction of all batches sorted by weight:\n");
+
+    for (int i = 0; i < total; i++) // display sorted batches by weight
+    {
+        printf("ID: %d | Name: %s | Weight: %.2f kg| Date: %d |Month: %s| year: %d | Time: %s\n",all_batches[i].product_id,all_batches[i].product_name,
+            all_batches[i].weight,all_batches[i].date[0],all_batches[i].month, all_batches[i].year,all_batches[i].Time);
+    }
+
+    printf("\nEnter a weight to search for KG: ");//Prompt user to enter weight
+    scanf("%f", &input_weight);
+
+    int weight_match = binary_Search_Weight(all_batches, total, input_weight);//performs binary search for entered weight
+
+    if (weight_match >= 0)// display result of search
+    {
+    printf("ID: %d\n", all_batches[weight_match].product_id);
+    printf("Name: %s\n", all_batches[weight_match].product_name);
+    printf("Weight: %.2f", all_batches[weight_match].weight);
+    printf("\nDate: %d %s %d time: %s\n", all_batches[weight_match].date[0], all_batches[weight_match].month, 
+        all_batches[weight_match].year, all_batches[weight_match].Time);
+    }
+    else 
+    {
+        printf("\nNo product found with weight %.2f\n", input_weight);//display if no weight found
+    }
+
+
+    printf("\nEnter yes to see summary report | Enter no if not required: ");//Ask user if they want to see report
+    scanf("%9s", report); // was scanf("%s", report) - added width limit matching the buffer size to prevent overflow
+
+    if (strcmp(report, "yes") == 0 || strcmp(report, "Yes") == 0)//prints report if character is input
+    {
+        printf("\n   Delivery Summary Report:    \n");//Display report
+
+        report_summary(all_batches, total);// Display batch  total, total weight and total price
+
+        printf("\nBatch 1 in delivery van:\n");
+        report_summary(batch1, 10);
+    
+        printf("\nBatch 2 in delivery van:\n");
+        report_summary(batch2, 10);
+    
+        printf("\nBatch 3 in delivery van:\n");
+        report_summary(batch3, 10);
+    
+        printf("\nBatch 4 in delivery van:\n");
+        report_summary(batch4, 10);
+    }
+    else
+    {
+        printf("No summary report needed");
+    }
+
+
+    return 0;
+}
+
+void merge(struct Production_data batch[], int left, int middle, int right) // combine both halves of the array
+{
+    int i , j = 0;
+    int k = left;
+    int size1 = middle - left + 1;//size for left array
+    int size2 = right - middle;//size for right array
+
+    struct Production_data left_half[size1], right_half[size2];
+
+    for (i = 0; i < size1; i++)// copy the data into the left half array
+    {
+        left_half[i] = batch[left + i];
+    }
+    for (j = 0; j < size2; j++)// copy to the right half
+    {
+        right_half[j] = batch[middle + 1 + j];
+    }
+
+    i = 0;
+    j = 0;
+
+    while (i < size1 && j < size2)// Merge the two halves back into one array in sorted order by weight
+    {
+        if (left_half[i].weight <= right_half[j].weight)// compare weights and add smaller one into the array
+        {
+            batch[k++] = left_half[i++];
+        } 
+        else 
+        {
+            batch[k++] = right_half[j++];
+        }
+    }
+
+    while (i < size1)// Copy any left over elements from the left half
+    {
+        batch[k++] = left_half[i++];
+    }
+    while (j < size2)// Copy any from the right half
+    {
+        batch[k++] = right_half[j++];
+    }
+}
+
+void mergeSort(struct Production_data batch[], int left, int right) //O(NLog(N))
+{
+    // This is the base case, ensuring there are at least 2 elements
+    if (left < right) 
+    {
+        int middle = left + (right - left) / 2;// Find the middle of the array
+
+        mergeSort(batch, left, middle);// Using recursion sorts the left half
+        mergeSort(batch, middle + 1, right);//sorts right half
+        merge(batch, left, middle, right);// uses merge function to make a single array
+    }
+}
+
+int binary_Search_Weight(struct Production_data batch[], int total, float input_Weight) // Use weight to search Binary
+{
+    int lowest = 0;
+    int highest = total - 1;
+    int result = -1;
+
+    while (lowest <= highest)//search while low is less than high
+    {
+        int mid = (lowest + highest) / 2;
+
+        if (batch[mid].weight == input_Weight)// If middle matches weight
+        {
+            result = mid;// Match found
+            highest = mid - 1;// keep checking for an earlier match
+        } 
+        else if (batch[mid].weight < input_Weight) // if the weight at the middle is less then the weight to be found
+        {
+            lowest = mid + 1;
+        }
+        else // if the weight at the middle larger then the input weight
+        {
+            highest = mid - 1;
+        }
+    }
+
+    return result;
+}
+void report_summary(struct Production_data all_batches[], int total)// Function to produce details for the report summary: price, weight, and total.
+{
+    float total_weight = 0;
+    int i = 0;
+    float total_price = 0;
+
+    while( i < total)
+    {
+        total_weight += all_batches[i].weight;//sum of batch weight
+        total_price += all_batches[i].price;//sum of batch weight
+        i++;
+    }
+
+    printf("Total weight of all products KG: %.2f\n", total_weight);//Display total weight
+    printf("Total price of all products: Euro: %.2f\n", total_price);//Display total price
+    printf("Total  products in delivery van: %d\n",total);//Display total
+
+
+}
