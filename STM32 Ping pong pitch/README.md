@@ -1,13 +1,15 @@
 # Ping Pong Pitch: STM32 Two Player Game
 
 ## About
-I made this in 2025 as a part of a group project with my friends Irfan Khan and Robert Sabau Mance during my second year at TU Dublin.
+I made this in 2025 as a part of a group project with my friends [Irfan Khan](https://www.linkedin.com/in/irfank06/) and [Robert Sabau Mance](https://www.linkedin.com/in/robertsabaumance) during my second year at TU Dublin.
 It's a football themed based off of the two-player game Pong. It was built for the STM32F031x6 microcontroller a small, low-cost 32-bit microcontroller .
 
 This project was quite big and was built upon numerous times in which we had to test for bugs and errors within the code.
 Working on this project taught me how to control the hardware directly, create my own display driver, and use PWM to make sounds.
 Creating new features for the game and completing it within a deadline taught me a huge amount.Fixing bugs and errors also helped me 
 understand how to better manage and develop a project.
+
+
 
 ## What it does
 - A two-player Pong game that runs on a TFT screen using SPI.
